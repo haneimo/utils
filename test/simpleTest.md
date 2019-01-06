@@ -1,5 +1,8 @@
 # SAMPLE COMMAND.
 
+sorry. testcode is not created.
+
+VVV command to test.  VVV
 ```
 PS> echo "hogehugahellohodemmklwanendaaaaaaaaaaaa" | ./AheadTextReader
 Popword:h, Buffer:ogehugah

@@ -18,7 +18,7 @@ public class AheadTextReader{
   
   public string PopForward( int charCount ){
     if( aheadCount < charCount ){
-      throw new Exception("ƒoƒbƒtƒ@‚æ‚è‘å‚«‚¢•¶Žš—ñ‚ðPopForward‚µ‚æ‚¤‚Æ‚µ‚½‚½‚ßAƒGƒ‰[‚Æ‚È‚è‚Ü‚µ‚½B");
+      throw new Exception("ãƒãƒƒãƒ•ã‚¡ã‚ˆã‚Šå¤§ãã„æ–‡å­—åˆ—ã‚’PopForwardã—ã‚ˆã†ã¨ã—ãŸãŸã‚ã€ã‚¨ãƒ©ãƒ¼ã¨ãªã‚Šã¾ã—ãŸã€‚");
     }
     
     string resultValue;

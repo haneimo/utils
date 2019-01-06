@@ -1,5 +1,6 @@
 # SAMPLE COMMAND.
 
+```
 PS> echo "hogehugahellohodemmklwanendaaaaaaaaaaaa" | ./AheadTextReader
 Popword:h, Buffer:ogehugah
 Popword:o, Buffer:gehugahe
@@ -21,3 +22,4 @@ Popword:l, Buffer:wanendaa
 Popword:w, Buffer:anendaaa
 Popword:a, Buffer:nendaaaa
 Popword:n, Buffer:endaaaaa
+```

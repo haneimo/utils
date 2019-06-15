@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Linq;
+using System.Collections.Generic;
 
 /*
  $env:PATH += "C:\Windows\Microsoft.NET\Framework64\v4.0..."(最後の...は環境によって書き換え。)
@@ -26,7 +28,9 @@ public class AheadTextReader{
   public string AheadBuffer { get{ return _aheadBuffer; } }
   private bool _atEndOfStream = false;
   public bool AtEndOfStream { get{ return _atEndOfStream; } }
-  
+  private List<int> splitHalfWidthIndexes = new List<int>();
+  private int bufferHeadWidthCount;
+  public int BufferHeadWidthCount{ get{return bufferHeadWidthCount;} }
   public AheadTextReader( TextReader sourceReader, int aheadCount ):this( sourceReader, aheadCount, 0, Int32.MaxValue ){}
   
   public AheadTextReader( TextReader sourceReader, int aheadCount, int startHalfWidthIndex, int outHalfWidthIndex ){
@@ -37,6 +41,10 @@ public class AheadTextReader{
     FillAheadBuffer();
   }
   
+  public void addSplitIndexWithHalfWidh( int splitIndex ){
+    splitHalfWidthIndexes.Add(splitIndex);
+  }
+
   public void setReadPosition( int startHalfWidthIndex, int outHalfWidthIndex ){
     if( lineCount == 0 && widthCount == 0 ){
       this.startHalfWidthIndex = startHalfWidthIndex;
@@ -66,22 +74,48 @@ public class AheadTextReader{
       _aheadBuffer = "";
     }
     
+    UpdateBufferHeadWidthCount( resultValue );
     FillAheadBuffer();
     
     return resultValue;
   }
   
+  private void UpdateBufferHeadWidthCount( string s ){
+    var lines = s.Split('\n');
+    if( lines.Count() == 1){
+      bufferHeadWidthCount = bufferHeadWidthCount + sjisEnc.GetByteCount( lines[0] );
+    }else{
+      bufferHeadWidthCount = sjisEnc.GetByteCount( lines[ lines.Count() -1 ] );
+    }
+  }
   
   public bool MatchForward( string targetWord ){
+   string validBuffer;
+   if( splitHalfWidthIndexes.Any() ){
+     if(  splitHalfWidthIndexes.Max() <= bufferHeadWidthCount ){
+       validBuffer = _aheadBuffer;
+     }else{
+       int recentIndex = splitHalfWidthIndexes.Where( a => bufferHeadWidthCount < a ).Min();
+       if( recentIndex - bufferHeadWidthCount <= aheadCount ){
+         validBuffer = _aheadBuffer.Substring(0,recentIndex - bufferHeadWidthCount);    
+       }else{
+         validBuffer = _aheadBuffer;
+       }
+     }
+   }else{
+     validBuffer = _aheadBuffer;
+   }
+
+
     if( targetWord == "" ){
       return false;
     }
   
-    if( _aheadBuffer.Length < targetWord.Length ){
+    if( validBuffer.Length < targetWord.Length ){
       return false;
     }
     
-    if( _aheadBuffer.Substring(0, targetWord.Length ) == targetWord ){
+    if( validBuffer.Substring(0, targetWord.Length ) == targetWord ){
       return true;
     } else {
       return false;
@@ -158,10 +192,16 @@ public class AheadTextReader{
   }
   
   public static void Main(){
-    var COBOL_START_INDEX = 6;
-    var COBOL_OUT_INDEX = 72;
+    //var COBOL_START_INDEX = 6;
+    //var COBOL_OUT_INDEX = 72;
     
-    var reader = new AheadTextReader(System.Console.In, 8, COBOL_START_INDEX, COBOL_OUT_INDEX);
+    //var reader = new AheadTextReader(System.Console.In, 8, COBOL_START_INDEX, COBOL_OUT_INDEX);
+    var reader = new AheadTextReader(System.Console.In, 8);
+    reader.addSplitIndexWithHalfWidh(0);
+    reader.addSplitIndexWithHalfWidh(6);
+    reader.addSplitIndexWithHalfWidh(7);
+    reader.addSplitIndexWithHalfWidh(73);
+
     string popWord;
     while( !reader.AtEndOfStream ){
       
@@ -174,7 +214,7 @@ public class AheadTextReader{
         popWord = reader.PopForward(1);
       }
       
-      System.Console.WriteLine( "Popword:" + popWord + ", Buffer:" + reader.AheadBuffer );
+      System.Console.WriteLine( "Popword:" + popWord + ", Buffer:" + reader.AheadBuffer +  ", LineCount:" + reader.LineCount + ", WidthCout:" +reader.WidthCount +", BufferHeadWidthCount" +reader.BufferHeadWidthCount );
     }
   }
 }

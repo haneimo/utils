@@ -21,7 +21,7 @@ public class AheadTextReader{
   public bool AtEndOfStream { get{ return _atEndOfStream; } }
   private List<int> splitHalfWidthIndexes = new List<int>();
   private int bufferHeadWidthCount;
-  public int BufferHeadWidthCount{ get{return bufferHeadWidthCount;} }
+  public int BufferHeadPosition{ get{return bufferHeadWidthCount;} }
   public AheadTextReader( TextReader sourceReader, int aheadCount ){
       reader = sourceReader;
       this.aheadCount = aheadCount;    
@@ -121,7 +121,7 @@ public class AheadTextReader{
       } else {
         popWord = reader.PopForward(1);
       }    
-      System.Console.WriteLine( "Popword:" + popWord + ", Buffer:" + reader.AheadBuffer +  ", BufferHeadWidthCount" + reader.BufferHeadWidthCount );
+      System.Console.WriteLine( "Popword:" + popWord + ", Buffer:" + reader.AheadBuffer +  ", BufferHeadPosition" + reader.BufferHeadPosition );
     }
   }
 }

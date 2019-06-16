@@ -32,6 +32,32 @@ public class AheadTextReader{
     splitHalfWidthIndexes.Add(splitIndex);
   }
   
+  public string PopForwardWithHalfWidth( int halfSizeCharCount ){
+    if( sjisEnc.GetByteCount( _aheadBuffer ) < halfSizeCharCount ){
+      throw new Exception("バッファより大きい文字列をPopForwardWithHalfWidthしようとしたため、エラーとなりました。");
+    }
+
+    int popLength = 0;
+    for( int i= halfSizeCharCount/2; i <= halfSizeCharCount; i++ ){
+      var s = _aheadBuffer.Substring(0,i);
+      if( sjisEnc.GetByteCount(s) == halfSizeCharCount){
+        popLength =  s.Length;
+        break;
+      }else if( sjisEnc.GetByteCount(s) > halfSizeCharCount) {
+        /* SIJSマルチバイト文字を取得しようとした際に前半バイトのみしか取得できない場合は 
+           エラー出力させる。*/
+        throw new Exception( halfSizeCharCount + "の半角サイズでPopForwardWithHalfWidthを実施しましたが、末尾全角文字が半分のサイズで分割されたため処理を継続できません。");
+      }
+    }
+
+    return PopForward(popLength);
+  }
+
+  private bool isHalfWidthChar(string str){
+    int num = sjisEnc.GetByteCount(str);
+    return num == str.Length;
+  }
+
   public string PopForward( int charCount ){
     if( aheadCount < charCount ){
       throw new Exception("バッファより大きい文字列をPopForwardしようとしたため、エラーとなりました。");

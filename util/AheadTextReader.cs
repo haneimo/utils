@@ -10,144 +10,155 @@ using System.Collections.Generic;
  csc /t:exe AheadTextReader.cs  
 */
 
-public class AheadTextReader{
-  static Encoding sjisEnc = Encoding.GetEncoding("Shift_JIS");
-  private TextReader reader;
-  private int aheadCount;
-  private string _aheadBuffer = "";
-    
-  public string AheadBuffer { get{ return _aheadBuffer; } }
-  private bool _atEndOfStream = false;
-  public bool AtEndOfStream { get{ return _atEndOfStream; } }
-  private List<int> splitHalfWidthIndexes = new List<int>();
-  private int bufferHeadWidthCount;
-  public int BufferHeadPosition{ get{return bufferHeadWidthCount;} }
-  public AheadTextReader( TextReader sourceReader, int aheadCount ){
-      reader = sourceReader;
-      this.aheadCount = aheadCount;    
-      FillAheadBuffer();
-  }
-  
-  public void addSplitIndexWithHalfWidh( int splitIndex ){
-    splitHalfWidthIndexes.Add(splitIndex);
-  }
-  
-  public string PopForwardWithHalfWidth( int halfSizeCharCount ){
-    if( sjisEnc.GetByteCount( _aheadBuffer ) < halfSizeCharCount ){
-      throw new Exception("バッファより大きい文字列をPopForwardWithHalfWidthしようとしたため、エラーとなりました。");
+public class AheadTextReader
+{
+    static Encoding sjisEnc = Encoding.GetEncoding("Shift_JIS");
+    private TextReader reader;
+    private int aheadCount;
+    private string _aheadBuffer = "";
+
+    public string AheadBuffer { get { return _aheadBuffer; } }
+    private bool _atEndOfStream = false;
+    public bool AtEndOfStream { get { return _atEndOfStream; } }
+    private HashSet<int> splitHalfWidthIndexes = new HashSet<int>();
+    private int bufferHeadWidthCount;
+    public int BufferHeadPosition { get { return bufferHeadWidthCount; } }
+    public AheadTextReader(TextReader sourceReader, int aheadCount)
+    {
+        reader = sourceReader;
+        this.aheadCount = aheadCount;
+        FillAheadBuffer();
     }
 
-    int popLength = 0;
-    for( int i= halfSizeCharCount/2; i <= halfSizeCharCount; i++ ){
-      var s = _aheadBuffer.Substring(0,i);
-      if( sjisEnc.GetByteCount(s) == halfSizeCharCount){
-        popLength =  s.Length;
-        break;
-      }else if( sjisEnc.GetByteCount(s) > halfSizeCharCount) {
-        /* SIJSマルチバイト文字を取得しようとした際に前半バイトのみしか取得できない場合は 
-           エラー出力させる。*/
-        throw new Exception( halfSizeCharCount + "の半角サイズでPopForwardWithHalfWidthを実施しましたが、末尾全角文字が半分のサイズで分割されたため処理を継続できません。");
-      }
+    public void addSplitIndexWithHalfWidh(int splitIndex)
+    {
+        splitHalfWidthIndexes.Add(splitIndex);
     }
 
-    return PopForward(popLength);
-  }
+    public string PopForward(int charCount)
+    {
+        if (aheadCount < charCount)
+        {
+            throw new Exception("バッファより大きい文字列をPopForwardしようとしたため、エラーとなりました。");
+        }
 
-  private bool isHalfWidthChar(string str){
-    int num = sjisEnc.GetByteCount(str);
-    return num == str.Length;
-  }
+        string resultValue;
+        if (_aheadBuffer.Length >= charCount)
+        {
+            resultValue = _aheadBuffer.Substring(0, charCount);
+            _aheadBuffer = _aheadBuffer.Substring(charCount, _aheadBuffer.Length - charCount);
+        }
+        else
+        {
+            resultValue = _aheadBuffer;
+            _aheadBuffer = "";
+        }
 
-  public string PopForward( int charCount ){
-    if( aheadCount < charCount ){
-      throw new Exception("バッファより大きい文字列をPopForwardしようとしたため、エラーとなりました。");
+        UpdateBufferHeadWidthCount(resultValue);
+        FillAheadBuffer();
+
+        return resultValue;
     }
-    
-    string resultValue;
-    if( _aheadBuffer.Length >= charCount ){
-      resultValue  = _aheadBuffer.Substring( 0, charCount );
-      _aheadBuffer = _aheadBuffer.Substring( charCount, _aheadBuffer.Length - charCount );
-    } else {
-      resultValue  = _aheadBuffer;
-      _aheadBuffer = "";
+
+    private void UpdateBufferHeadWidthCount(string s)
+    {
+        var lines = s.Split('\n');
+        if (lines.Count() == 1)
+        {
+            bufferHeadWidthCount = bufferHeadWidthCount + sjisEnc.GetByteCount(lines[0]);
+        }
+        else
+        {
+            bufferHeadWidthCount = sjisEnc.GetByteCount(lines[lines.Count() - 1]);
+        }
     }
-    
-    UpdateBufferHeadWidthCount( resultValue );
-    FillAheadBuffer();
-    
-    return resultValue;
-  }
-  
-  private void UpdateBufferHeadWidthCount( string s ){
-    var lines = s.Split('\n');
-    if( lines.Count() == 1){
-      bufferHeadWidthCount = bufferHeadWidthCount + sjisEnc.GetByteCount( lines[0] );
-    }else{
-      bufferHeadWidthCount = sjisEnc.GetByteCount( lines[ lines.Count() -1 ] );
-    }
-  }
-  
-  public bool MatchForward( string targetWord ){
-   string validBuffer;
-   if( splitHalfWidthIndexes.Any() ){
-     if(  splitHalfWidthIndexes.Max() <= bufferHeadWidthCount ){
-       validBuffer = _aheadBuffer;
-     }else{
-       int recentIndex = splitHalfWidthIndexes.Where( a => bufferHeadWidthCount < a ).Min();
-       if( recentIndex - bufferHeadWidthCount <= aheadCount ){
-         validBuffer = _aheadBuffer.Substring(0,recentIndex - bufferHeadWidthCount);    
-       }else{
-         validBuffer = _aheadBuffer;
-       }
-     }
-   }else{
-     validBuffer = _aheadBuffer;
-   }
+
+    public bool MatchForward(string targetWord)
+    {
+        string validBuffer;
+        if (splitHalfWidthIndexes.Any())
+        {
+            if (splitHalfWidthIndexes.Max() <= bufferHeadWidthCount)
+            {
+                validBuffer = _aheadBuffer;
+            }
+            else
+            {
+                int recentIndex = splitHalfWidthIndexes.Where(a => bufferHeadWidthCount < a).Min();
+                if (recentIndex - bufferHeadWidthCount <= aheadCount)
+                {
+                    validBuffer = _aheadBuffer.Substring(0, recentIndex - bufferHeadWidthCount);
+                }
+                else
+                {
+                    validBuffer = _aheadBuffer;
+                }
+            }
+        }
+        else
+        {
+            validBuffer = _aheadBuffer;
+        }
 
 
-    if( targetWord == "" ){
-      return false;
-    }
-  
-    if( validBuffer.Length < targetWord.Length ){
-      return false;
-    }
-    
-    if( validBuffer.Substring(0, targetWord.Length ) == targetWord ){
-      return true;
-    } else {
-      return false;
-    }
-  }
-    
-  private void FillAheadBuffer(){
-    char[] readChars = new Char[ aheadCount - _aheadBuffer.Length ];
-    var result = reader.Read( readChars, 0, readChars.Length );
-    if( result != 0 ){
-      _aheadBuffer = _aheadBuffer + new String( readChars );
-    } else {
-      if( _aheadBuffer.Length == 0 ){
-        _atEndOfStream = true;
-      }
-    }
-  }
-  
-  public static void Main(){
-    var reader = new AheadTextReader(System.Console.In, 8);
-    reader.addSplitIndexWithHalfWidh(0);
-    reader.addSplitIndexWithHalfWidh(6);
-    reader.addSplitIndexWithHalfWidh(7);
-    reader.addSplitIndexWithHalfWidh(73);
+        if (targetWord == "")
+        {
+            return false;
+        }
 
-    string popWord;
-    while( !reader.AtEndOfStream ){
-      if( reader.MatchForward("end") ) break;
-      if( reader.MatchForward("hello") ){
-        popWord = reader.PopForward(5);
-      } else {
-        popWord = reader.PopForward(1);
-      }    
-      System.Console.WriteLine( "Popword:" + popWord + ", Buffer:" + reader.AheadBuffer +  ", BufferHeadPosition" + reader.BufferHeadPosition );
+        if (validBuffer.Length < targetWord.Length)
+        {
+            return false;
+        }
+
+        if (validBuffer.Substring(0, targetWord.Length) == targetWord)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
-  }
+
+    private void FillAheadBuffer()
+    {
+        char[] readChars = new Char[aheadCount - _aheadBuffer.Length];
+        var result = reader.Read(readChars, 0, readChars.Length);
+        if (result != 0)
+        {
+            _aheadBuffer = _aheadBuffer + new String(readChars);
+        }
+        else
+        {
+            if (_aheadBuffer.Length == 0)
+            {
+                _atEndOfStream = true;
+            }
+        }
+    }
+
+    public static void Main()
+    {
+        var reader = new AheadTextReader(System.Console.In, 8);
+        reader.addSplitIndexWithHalfWidh(0);
+        reader.addSplitIndexWithHalfWidh(6);
+        reader.addSplitIndexWithHalfWidh(7);
+        reader.addSplitIndexWithHalfWidh(73);
+
+        string popWord;
+        while (!reader.AtEndOfStream)
+        {
+            if (reader.MatchForward("end")) break;
+            if (reader.MatchForward("hello"))
+            {
+                popWord = reader.PopForward(5);
+            }
+            else
+            {
+                popWord = reader.PopForward(1);
+            }
+            System.Console.WriteLine("Popword:" + popWord + ", Buffer:" + reader.AheadBuffer + ", BufferHeadPosition" + reader.BufferHeadPosition);
+        }
+    }
 }

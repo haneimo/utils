@@ -4,7 +4,7 @@ using System;
  csc /t:exe ChunkWord.cs /r:.\ISpecialWord.dll /r:.\AheadTextReader.dll /r:.\SimpleTokenParser.dll /r:.\Token.dll
  */
 
-public class ChunkWord : ISpecialWord {
+public class ChunkWord : ASpecialWord {
   private string startWord;
   private string endWord;
   private string escapeWord;
@@ -24,15 +24,15 @@ public class ChunkWord : ISpecialWord {
     this.escapeWord = escapeWord;
   }
   
-  public string GetMatchingWord(){
+  public override string GetMatchingWord(){
     return startWord;
   }
   
-  public int CalcurateWordLength(){
+  public override int CalcurateWordLength(){
     return Math.Max( Math.Max( startWord.Length, endWord.Length), escapeWord.Length );
   }
   
-  public Token Parse( AheadTextReader source ){
+  public override Token Parse( AheadTextReader source ){
     if( source.MatchForward( startWord ) ) {
       var buff = source.PopForward( startWord.Length );
       while( !source.MatchForward( endWord ) || source.MatchForward( escapeWord ) ){

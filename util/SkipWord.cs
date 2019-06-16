@@ -3,7 +3,7 @@
  csc /t:exe SkipWord.cs /r:.\ISpecialWord.dll /r:.\AheadTextReader.dll /r:.\SimpleTokenParser.dll /r:.\Token.dll
  */
 
-public class SkipWord : ISpecialWord {
+public class SkipWord : ASpecialWord {
   private string TOKEN_TYPE_SKIP = "TOKEN_TYPE_SKIP";
   private string word;
   
@@ -12,11 +12,11 @@ public class SkipWord : ISpecialWord {
     this.word = word;
   }
   
-  public string GetMatchingWord(){
+   public override string GetMatchingWord(){
     return word;
   }
-  
-  public Token Parse( AheadTextReader source ){
+
+   public override Token Parse( AheadTextReader source ){
     if( source.MatchForward( word ) ) {
       var w = source.PopForward( word.Length );
       return new Token( TOKEN_TYPE_SKIP, w );
@@ -25,7 +25,7 @@ public class SkipWord : ISpecialWord {
     }
   }
 
-  public int CalcurateWordLength(){
+   public override int CalcurateWordLength(){
     return word.Length;
   }
 

@@ -3,7 +3,7 @@
  csc /t:exe SplitWord.cs /r:.\ISpecialWord.dll /r:.\AheadTextReader.dll /r:.\SimpleTokenParser.dll /r:.\Token.dll
  */
 
-public class SplitWord : ISpecialWord {
+public class SplitWord : ASpecialWord {
   private string word;
   private const string TOKEN_TYPE_SPLIT = "TOKEN_TYPE_SPLIT";
   
@@ -11,11 +11,11 @@ public class SplitWord : ISpecialWord {
     this.word = word;
   }
   
-  public string GetMatchingWord(){
+  public override string GetMatchingWord(){
     return word;
   }
   
-  public Token Parse( AheadTextReader source ){
+  public override Token Parse( AheadTextReader source ){
     if( source.MatchForward( word ) ) {
       return new Token( TOKEN_TYPE_SPLIT, source.PopForward( word.Length ));
     } else {
@@ -23,7 +23,7 @@ public class SplitWord : ISpecialWord {
     }
   }
   
-  public int CalcurateWordLength(){
+  public override int CalcurateWordLength(){
     return word.Length;
   }
 

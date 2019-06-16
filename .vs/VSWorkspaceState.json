@@ -1,8 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\src"
+    "\\util"
   ],
-  "SelectedNode": "\\src\\SimpleTokenParser.cs",
+  "SelectedNode": "\\util\\App.config",
   "PreviewInSolutionExplorer": false
 }

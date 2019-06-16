@@ -1,2 +1,0 @@
-E:\project\util\util\obj\Debug\util.csprojAssemblyReference.cache
-E:\project\util\util\obj\Debug\util.csproj.CoreCompileInputs.cache

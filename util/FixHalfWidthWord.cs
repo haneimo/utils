@@ -2,7 +2,8 @@ using System;
 using System.Text;
 
 /* 
- csc /t:exe SkipWord.cs /r:.\ISpecialWord.dll /r:.\AheadTextReader.dll /r:.\SimpleTokenParser.dll /r:.\Token.dll
+ csc /t:library FixHalfWidthWord.cs /r:.\ASpecialWord.dll /r:.\AheadTextReader.dll /r:.\SimpleTokenParser.dll /r:.\Token.dll
+ csc /t:exe FixHalfWidthWord.cs /r:.\ASpecialWord.dll /r:.\AheadTextReader.dll /r:.\SimpleTokenParser.dll /r:.\Token.dll
  */
 
 public class FixHalfWidthWord : ASpecialWord
@@ -54,11 +55,11 @@ public class FixHalfWidthWord : ASpecialWord
                     result += source.PopForward(1);
                 }
             }
-            // ÅI“Ç•¶š‚ªƒ}ƒ‹ƒ`ƒoƒCƒg•¶š‚Åw’è‚µ‚½”¼Šp•¶šƒTƒCƒY‚ğƒI[ƒo[‚µ‚½‚Æ‚µ‚Ä‚à³íˆ—‚·‚éB
-            // => test Code‚Å¦‚¹B
+            // ï¿½ÅIï¿½Çï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½}ï¿½ï¿½ï¿½`ï¿½oï¿½Cï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Åwï¿½è‚µï¿½ï¿½ï¿½ï¿½ï¿½pï¿½ï¿½ï¿½ï¿½ï¿½Tï¿½Cï¿½Yï¿½ï¿½ï¿½Iï¿½[ï¿½oï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½Æ‚ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½íˆï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
+            // => test Codeï¿½Åï¿½ï¿½ï¿½ï¿½B
             /*if (sjisEnc.GetByteCount(result) > halfWidthSize)
             {
-                throw new Exception("‰ğÍƒGƒ‰[F" + source.BufferHeadPosition + "•t‹ß‚ÅƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½B");
+                throw new Exception("ï¿½ï¿½ÍƒGï¿½ï¿½ï¿½[ï¿½F" + source.BufferHeadPosition + "ï¿½tï¿½ß‚ÅƒGï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½B");
             }*/
 
             return new Token(TOKEN_TYPE_TOKEN_TYPE_FIXBYTESIZE, result);

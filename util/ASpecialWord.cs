@@ -1,7 +1,7 @@
 using System;
 
 /*
-  csc /t:library .\ISpecialWord.cs /r:.\AheadTextReader.dll /r:./Token.dll
+  csc /t:library .\ASpecialWord.cs /r:.\AheadTextReader.dll /r:./Token.dll
 */
 
 public abstract class ASpecialWord{

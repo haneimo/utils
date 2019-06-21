@@ -27,15 +27,6 @@ public class SplitWord : ASpecialWord {
     return word.Length;
   }
 
-  public static void Main(string[] args){
-    var parser = new SimpleTokenParser();
-    parser.AddSpecialWord( new SplitWord("select") );
-    parser.AddSpecialWord( new SplitWord("from") );
-    parser.AddSpecialWord( new SplitWord("where") );
-    
-    foreach( var token in parser.iteratorToken( System.Console.In ) ){
-      System.Console.WriteLine( token );
-    }
-  }
+
 }
 

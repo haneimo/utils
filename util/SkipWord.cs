@@ -29,14 +29,6 @@ public class SkipWord : ASpecialWord {
     return word.Length;
   }
 
-  public static void Main(string[] args){
-    var parser = new SimpleTokenParser();
-    parser.AddSpecialWord( new SkipWord(" ") );
-    parser.AddSpecialWord( new SkipWord("\n") );
-    
-    foreach( var token in parser.iteratorToken( System.Console.In ) ){
-      System.Console.WriteLine( token );
-    }
-  }
+
 }
 

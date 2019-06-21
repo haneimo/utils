@@ -23,8 +23,19 @@ public class AheadTextReader
     private HashSet<int> splitHalfWidthIndexes = new HashSet<int>();
     private int bufferHeadWidthCount;
     public int BufferHeadPosition { get { return bufferHeadWidthCount; } }
+    public int lineCount;
+
+    public bool IsNextReadingOnSplitArea(int length)
+    {
+        return splitHalfWidthIndexes.Where(i => bufferHeadWidthCount <= i && i <= bufferHeadWidthCount + length).Count() > 0;
+    }
+
+    public int LinePositoin { get { return lineCount; } }
+
     public AheadTextReader(TextReader sourceReader, int aheadCount)
     {
+        bufferHeadWidthCount = 0;
+        lineCount = 0;
         reader = sourceReader;
         this.aheadCount = aheadCount;
         FillAheadBuffer();
@@ -62,14 +73,15 @@ public class AheadTextReader
 
     private void UpdateBufferHeadWidthCount(string s)
     {
-        var lines = s.Split('\n');
-        if (lines.Count() == 1)
+        var l = s.Split('\n');
+        if (l.Count() == 1)
         {
-            bufferHeadWidthCount = bufferHeadWidthCount + sjisEnc.GetByteCount(lines[0]);
+            bufferHeadWidthCount = bufferHeadWidthCount + sjisEnc.GetByteCount(l[0]);
         }
         else
         {
-            bufferHeadWidthCount = sjisEnc.GetByteCount(lines[lines.Count() - 1]);
+            bufferHeadWidthCount = sjisEnc.GetByteCount(l[l.Count() - 1]);
+            lineCount += l.Count() - 1;
         }
     }
 
@@ -135,30 +147,6 @@ public class AheadTextReader
             {
                 _atEndOfStream = true;
             }
-        }
-    }
-
-    public static void Main()
-    {
-        var reader = new AheadTextReader(System.Console.In, 8);
-        reader.addSplitIndexWithHalfWidh(0);
-        reader.addSplitIndexWithHalfWidh(6);
-        reader.addSplitIndexWithHalfWidh(7);
-        reader.addSplitIndexWithHalfWidh(73);
-
-        string popWord;
-        while (!reader.AtEndOfStream)
-        {
-            if (reader.MatchForward("end")) break;
-            if (reader.MatchForward("hello"))
-            {
-                popWord = reader.PopForward(5);
-            }
-            else
-            {
-                popWord = reader.PopForward(1);
-            }
-            System.Console.WriteLine("Popword:" + popWord + ", Buffer:" + reader.AheadBuffer + ", BufferHeadPosition" + reader.BufferHeadPosition);
         }
     }
 }

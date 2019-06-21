@@ -45,8 +45,8 @@
   <ItemGroup>
     <Compile Include="AheadTextReader.cs" />
     <Compile Include="ChunkWord.cs" />
-    <Compile Include="FixHalfWidthSizeWord.cs" />
     <Compile Include="ASpecialWord.cs" />
+    <Compile Include="FixHalfWidthWord.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleTokenParser.cs" />
     <Compile Include="SkipWord.cs" />

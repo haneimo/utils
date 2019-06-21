@@ -55,12 +55,11 @@ public class FixHalfWidthWord : ASpecialWord
                     result += source.PopForward(1);
                 }
             }
-            // �ŏI�Ǎ��������}���`�o�C�g�����Ŏw�肵�����p�����T�C�Y���I�[�o�[�����Ƃ��Ă����폈������B
-            // => test Code�Ŏ����B
-            /*if (sjisEnc.GetByteCount(result) > halfWidthSize)
+
+            if (sjisEnc.GetByteCount(result) > halfWidthSize)
             {
-                throw new Exception("��̓G���[�F" + source.BufferHeadPosition + "�t�߂ŃG���[���������܂����B");
-            }*/
+                throw new Exception("最終文字として全角文字を読み込んだことで、指定した半角文字数を超えてしまいました。行位置=" + source.LinePositoin  + ", 文字位置=" + source.BufferHeadPosition);
+            }
 
             return new Token(TOKEN_TYPE_TOKEN_TYPE_FIXBYTESIZE, result);
         }
@@ -75,17 +74,5 @@ public class FixHalfWidthWord : ASpecialWord
         return 0;
     }
 
-    public static void Main(string[] args)
-    {
-        var parser = new SimpleTokenParser();
-        parser.AddFixHalfWidthWord(new FixHalfWidthWord(0, 6));
-        parser.AddFixHalfWidthWord(new FixHalfWidthWord(6, 1));
-        parser.AddFixHalfWidthWord(new FixHalfWidthWord(78, Int32.MaxValue));
 
-
-        foreach (var token in parser.iteratorToken(System.Console.In))
-        {
-            System.Console.WriteLine(token);
-        }
-    }
 }

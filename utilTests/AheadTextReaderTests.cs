@@ -1,20 +1,35 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Util.Exceptions;
 
 namespace Tests
 {
     [TestClass()]
     public class AheadTextReaderTests
     {
-        //[TestMethod()]
-        //public void AheadTextReaderTest()
-        //{
-        //    Assert.Fail();
-        //}
+        [TestMethod()]
+        public void AheadCountにゼロを指定した場合例外がスローされること()
+        {
+            bool wasThrowingException = false;
+            try
+            {
+                var reader = new AheadTextReader(new StringReader("dummy"), 0);
+            }
+            catch (InvalidBufferSizeException e)
+            {
+                wasThrowingException = true;
+            }
+
+            if (!wasThrowingException)
+            {
+                Assert.Fail();
+            }
+        }
 
         //[TestMethod()]
         //public void addSplitIndexWithHalfWidhTest()

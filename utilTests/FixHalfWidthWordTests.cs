@@ -42,18 +42,24 @@ namespace Tests
         //}
 
         [TestMethod()]
-        public void MainTest()
+        public void コボル風の文字FixHalfWidthWord機能にて区切ることができること()
         {
-                var parser = new SimpleTokenParser();
-                parser.AddFixHalfWidthWord(new FixHalfWidthWord(0, 6));
-                parser.AddFixHalfWidthWord(new FixHalfWidthWord(6, 1));
-                parser.AddFixHalfWidthWord(new FixHalfWidthWord(16, Int32.MaxValue));
+            var parser = new SimpleTokenParser();
+            parser.AddFixHalfWidthWord(new FixHalfWidthWord(0, 6));
+            parser.AddFixHalfWidthWord(new FixHalfWidthWord(6, 1));
+            parser.AddFixHalfWidthWord(new FixHalfWidthWord(16, Int32.MaxValue));
 
-                var stringReader = new StringReader("999999*aaa      comment" + "\n" + "111111 aiueoc");
-                var result = new  List<Token>(parser.iteratorToken(stringReader));
+            var stringReader = new StringReader("999999*zxy   cbacomment" + "\n" + "111111 aiueoc");
+            var result = new List<Token>(parser.iteratorToken(stringReader));
 
-            Assert.AreEqual(result[0].ToString(), "999999");
-                
+            Assert.AreEqual<string>(result[0].Body, "999999");
+            Assert.AreEqual<string>(result[1].Body, "*");
+            Assert.AreEqual<string>(result[2].Body, "zxy   cba");
+            Assert.AreEqual<string>(result[3].Body, "comment");
+            Assert.AreEqual<string>(result[4].Body, "\n");
+            Assert.AreEqual<string>(result[5].Body, "111111");
+            Assert.AreEqual<string>(result[6].Body, " ");
+            Assert.AreEqual<string>(result[7].Body, "aiueoc");
         }
     }
 }

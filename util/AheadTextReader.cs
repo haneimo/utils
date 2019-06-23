@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Linq;
 using System.Collections.Generic;
+using Util.Exceptions;
 
 /*
  $env:PATH += "C:\Windows\Microsoft.NET\Framework64\v4.0..."(最後の...は環境によって書き換え。)
@@ -34,6 +35,11 @@ public class AheadTextReader
 
     public AheadTextReader(TextReader sourceReader, int aheadCount)
     {
+        if (aheadCount <= 0)
+        {
+            throw new InvalidBufferSizeException(aheadCount);
+        }
+
         bufferHeadWidthCount = 0;
         lineCount = 0;
         reader = sourceReader;

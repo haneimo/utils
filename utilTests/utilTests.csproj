@@ -60,6 +60,7 @@
     <Compile Include="ChunkWordTests.cs" />
     <Compile Include="FixHalfWidthWordTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SimpleTokenParserTests.cs" />
     <Compile Include="SplitWordTests.cs" />
   </ItemGroup>
   <ItemGroup>

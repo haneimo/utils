@@ -5,9 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using Parser;
+using Parser.Word;
 
 namespace Tests
 {
+
     [TestClass()]
     public class FixHalfWidthWordTests
     {

@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{3111BD53-B1DC-4F9B-8AF1-71EBCA12D057}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>util</RootNamespace>
+    <RootNamespace>Parser</RootNamespace>
     <AssemblyName>util</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -43,15 +43,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AheadTextReader.cs" />
-    <Compile Include="ChunkWord.cs" />
-    <Compile Include="ASpecialWord.cs" />
-    <Compile Include="Exceptions\InvalidBufferSizeException.cs" />
-    <Compile Include="FixHalfWidthWord.cs" />
+    <Compile Include="Parser\AheadTextReader.cs" />
+    <Compile Include="Parser\Word\ChunkWord.cs" />
+    <Compile Include="Parser\Word\ASpecialWord.cs" />
+    <Compile Include="Parser\Exceptions\InvalidBufferSizeException.cs" />
+    <Compile Include="Parser\Word\FixHalfWidthWord.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SimpleTokenParser.cs" />
-    <Compile Include="SplitWord.cs" />
-    <Compile Include="Token.cs" />
+    <Compile Include="Parser\SimpleTokenParser.cs" />
+    <Compile Include="Parser\Word\SplitWord.cs" />
+    <Compile Include="Parser\Token.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
